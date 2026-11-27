@@ -1,15 +1,35 @@
-name: Deploy LeaveManagementSystem to EC2
+name: Build on GitHub and Deploy to EC2
 
 on:
   push:
     branches: [ "master" ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy via SSH
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Publish .NET App
+      run: dotnet publish LeaveManagementSystem/LeaveManagementSystem.csproj -c Release -o ./publish
+
+    - name: Copy compiled app to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "publish/*,Dockerfile,docker-compose.yml"
+        target: "~/LeaveManagementSystem"
+
+    - name: Start Containers on EC2
       uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.SERVER_HOST }}
@@ -17,6 +37,5 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd ~/LeaveManagementSystem
-          git pull origin master
           docker image prune -af
           DB_PASSWORD="${{ secrets.DB_PASSWORD }}" docker compose up -d --build

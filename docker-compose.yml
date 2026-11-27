@@ -1,27 +1,15 @@
 services:
-  db:
-    image: mcr.microsoft.com/azure-sql-edge:latest
-    container_name: leave-sqlserver
-    restart: unless-stopped
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "${DB_PASSWORD}"
-    ports:
-      - "1433:1433"
-    volumes:
-      - sql_data:/var/opt/mssql
-
   webapp:
     build: .
     container_name: leave-webapp
     restart: unless-stopped
-    depends_on:
-      - db
     ports:
       - "80:8080"
+    volumes:
+      - app_data:/app/data
     environment:
       ASPNETCORE_ENVIRONMENT: "Production"
-      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=LeaveDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;"
+      ConnectionStrings__DefaultConnection: "Data Source=/app/data/LeaveDB.sqlite"
 
 volumes:
-  sql_data:
+  app_data:

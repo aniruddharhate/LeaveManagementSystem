@@ -22,19 +22,8 @@ namespace LeaveManagementSystem
 
             // UPDATED: Added transient error resiliency and optimized timeouts
             builder.Services.AddDbContext<LeaveDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("DefaultConnection"),
-                    sqlServerOptionsAction: sqlOptions =>
-                    {
-                        // Enables automatic retries if the database experiences a brief hiccups
-                        sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 5,
-                            maxRetryDelay: TimeSpan.FromSeconds(5),
-                            errorNumbersToAdd: null);
-
-                        // Prevents the application from freezing for longer than 15 seconds if a query stalls
-                        sqlOptions.CommandTimeout(15);
-                    }));
+                options.UseSqlite(
+                    builder.Configuration.GetConnectionString("DefaultConnection"));
 
             builder.Services.AddScoped<LeaveManagementSystem.Services.LeaveRequestService>();
 
@@ -43,7 +32,7 @@ namespace LeaveManagementSystem
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<LeaveDbContext>();
-                db.Database.Migrate();
+                db.Database.EnsureCreated();
             }
 
             if (!app.Environment.IsDevelopment())

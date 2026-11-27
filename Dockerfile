@@ -1,4 +1,4 @@
-FROM ://microsoft.com AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["LeaveManagementSystem/LeaveManagementSystem.csproj", "LeaveManagementSystem/"]
 RUN dotnet restore "LeaveManagementSystem/LeaveManagementSystem.csproj"
@@ -6,7 +6,7 @@ COPY . .
 WORKDIR "/src/LeaveManagementSystem"
 RUN dotnet publish "LeaveManagementSystem.csproj" -c Release -o /app/publish --no-restore
 
-FROM ://microsoft.com AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 RUN apt-get update && apt-get install -y libfontconfig1 && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/publish .

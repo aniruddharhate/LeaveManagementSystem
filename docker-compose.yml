@@ -1,6 +1,6 @@
 services:
   db:
-    image: ://microsoft.com
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: leave-sqlserver
     restart: unless-stopped
     environment:
@@ -17,7 +17,7 @@ services:
       retries: 10
 
   migrator:
-    image: ://microsoft.com
+    image: mcr.microsoft.com/dotnet/sdk:8.0
     working_dir: /src/LeaveManagementSystem
     volumes:
       - .:/src

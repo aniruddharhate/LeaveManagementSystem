@@ -16,28 +16,13 @@ services:
       timeout: 5s
       retries: 10
 
-  migrator:
-    image: mcr.microsoft.com/dotnet/sdk:8.0
-    working_dir: /src/LeaveManagementSystem
-    volumes:
-      - .:/src
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=LeaveDB;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;"
-    command: >
-      bash -c "dotnet tool install --global dotnet-ef --version 8.0.0 &&
-               export PATH=\"$$PATH:/root/.dotnet/tools\" &&
-               dotnet ef database update"
-
   webapp:
     build: .
     container_name: leave-webapp
     restart: unless-stopped
     depends_on:
-      migrator:
-        condition: service_completed_successfully
+      db:
+        condition: service_healthy
     ports:
       - "80:8080"
     environment:

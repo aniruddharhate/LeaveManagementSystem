@@ -23,7 +23,7 @@ namespace LeaveManagementSystem
             // UPDATED: Added transient error resiliency and optimized timeouts
             builder.Services.AddDbContext<LeaveDbContext>(options =>
                 options.UseSqlite(
-                    builder.Configuration.GetConnectionString("DefaultConnection"));
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<LeaveManagementSystem.Services.LeaveRequestService>();
 
@@ -41,7 +41,6 @@ namespace LeaveManagementSystem
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

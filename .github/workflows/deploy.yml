@@ -38,5 +38,5 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd ~/LeaveManagementSystem
-          docker image prune -af
           DB_PASSWORD="${{ secrets.DB_PASSWORD }}" docker compose up -d --build
+          docker image prune -f
